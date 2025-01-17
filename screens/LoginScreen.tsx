@@ -1,3 +1,4 @@
+import { useNavigation } from '@react-navigation/native';
 import axios from 'axios';
 import React, { useState } from 'react';
 import { View, Text, TextInput, Button, StyleSheet, Image, Alert } from 'react-native';
@@ -6,15 +7,17 @@ const LoginScreen = () => {
   const [mobileNumber, setMobileNumber] = useState('');
   const [email, setEmail] = useState('');
   const BASE_URL = "http://10.0.2.2:8080"; // Replace localhost with 10.0.2.2
+  const navigation = useNavigation();
 
-  const handleSignup = async ({ navigation }) => {
+  const handleSignup = async () => {
     // Signup logic
     console.log('Mobile:', mobileNumber);
     console.log('Email:', email);
  
     try {
         await axios.post(`${BASE_URL}/api/auth/signup`, { mobileNumber, email });
-        Alert.alert('Signup successful', 'Proceeding to OTP verification');
+        await axios.post(`${BASE_URL}/api/auth/send-otp`, { mobileNumber });
+        // Alert.alert('Signup successful', 'Proceeding to OTP verification');
         navigation.navigate('OtpVerification', { mobileNumber });
     } catch (error) {
         console.log(error);
@@ -42,14 +45,14 @@ const LoginScreen = () => {
         value={mobileNumber}
         onChangeText={setMobileNumber}
       />
-      <TextInput
+      {/* <TextInput
         style={styles.input}
         placeholder="Enter Email (optional)"
         keyboardType="email-address"
         value={email}
         onChangeText={setEmail}
-      />
-      <Button title="Signup" onPress={handleSignup} />
+      /> */}
+      <Button title="Continue" onPress={handleSignup} />
     </View>
   );
 };
@@ -57,10 +60,11 @@ const LoginScreen = () => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
+    backgroundColor: '#fff',
     padding: 20,
-    backgroundColor: '#f5f5f5',
+    alignItems: 'center', // Center horizontally
+    justifyContent: 'flex-start', // Align at the top
+    paddingTop: 50, // Add spacing from the top
   },
   image: {
     width: '100%',
@@ -69,7 +73,7 @@ const styles = StyleSheet.create({
   },
   headerText: {
     fontSize: 24,
-    fontWeight: 'bold',
+    // fontWeight: 'bold',
     marginBottom: 20,
     color: '#333',
   },
